@@ -8,7 +8,10 @@
 
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
     <div class="col">
-        <a asp-action="Create" class="card h-100 shadow-sm border-0 d-flex align-items-center justify-content-center text-decoration-none add-card">
+        <a href="javascript:void(0);"
+           class = "card h-100 shadow-sm border-0 d-flex align-items-center justify-content-center text-decoration-none add-card"
+           title="Edit"
+           onclick="openAddModal()">
             <div class="text-center">
                 <i class="bi bi-plus-circle" style="font-size: 3rem; color: #6c757d;"></i>
                 <p class="mt-2 text-muted">Add Book</p>
@@ -23,14 +26,17 @@
 
                 <div class="book-actions">
                     <a href="javascript:void(0);"
-                                   class="action-btn"
-                                   title="Edit"
-                                   onclick="openEditModal('@book.BookId')">
+                       class="action-btn"
+                       title="Edit"
+                       onclick="openEditModal('@book.BookId')">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a asp-action="Details" asp-route-id="@book.BookId" class="action-btn" title="Details"/>
+                    <a asp-action="Details" asp-route-id="@book.BookId" class="action-btn" title="Details"></a>
 
-                    <a asp-action="Delete" asp-route-id="@book.BookId" class="action-btn" title="Delete">
+                    <a href="javascript:void(0);"
+                       class="action-btn"
+                       title="Delete"
+                       onclick="openDeleteModal('/Book/DeleteModal/@book.BookId', 'Delete Book')">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>
@@ -51,6 +57,7 @@
     }
 </div>
 
+<!-- Bootstrap Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -71,18 +78,14 @@
 
 @section Scripts {
     <script>
-            function openEditModal(bookId) {
+        function openEditModal(bookId) {
             fetch(`/Book/EditModal?id=${encodeURIComponent(bookId)}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error loading edit form.');
-                    }
+                    if (!response.ok) throw new Error('Error loading edit form.');
                     return response.text();
                 })
                 .then(html => {
                     document.querySelector('#exampleModal .modal-content').innerHTML = html;
-
-                    // Show the Bootstrap modal (v5 API)
                     let modal = new bootstrap.Modal(document.getElementById('exampleModal'));
                     modal.show();
                 })
@@ -92,23 +95,42 @@
                 });
         }
 
-        function openDeleteModal(url, title) {
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function (data) {
-                    $('#exampleModal .modal-content').html(data);
-                    $('#exampleModalLabel').text(title);
-                    $('#exampleModal').modal('show');
-                },
-                error: function () {
-                    alert('Error loading details.');
+        function openAddModal() {
+                    fetch(`/Book/AddModal`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error loading edit form.');
+                            return response.text();
+                        })
+                        .then(html => {
+                            document.querySelector('#exampleModal .modal-content').innerHTML = html;
+                            let modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                            modal.show();
+                        })
+                        .catch(error => {
+                            alert(error.message);
+                            console.error(error);
+                        });
                 }
-            });
-        }
 
         document.addEventListener("submit", function (e) {
             const form = e.target;
+
+            if (form.matches("#AddBookForm")) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: form.method,
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Error saving changes.');
+                    location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+            }
+
             if (form.matches("#editBookForm")) {
                 e.preventDefault();
                 const formData = new FormData(form);
@@ -117,13 +139,27 @@
                     body: new URLSearchParams(formData)
                 })
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                    if (!response.ok) throw new Error('Error saving changes.');
                     location.reload();
                 })
                 .catch(error => {
-                    alert('Error saving changes: ' + error.message);
+                    alert(error.message);
+                });
+            }
+
+            if (form.matches("#deleteBookForm")) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: form.method,
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Delete failed.');
+                    location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
                 });
             }
         });

@@ -9,11 +9,11 @@ namespace Library_Management.Models
         public Guid? BookCopyId { get; set; }
 
         [Required(ErrorMessage = "Book title is required.")]
-        [Display(Name ="Book Title asodmflasdfmladsfj")]
+        [Display(Name ="Book Title")]
         public string? Title { get; set; }
 
         [Required(ErrorMessage = "ISBN is required.")]
-        [Display(Name ="ABSCBN")]
+        [Display(Name = "ISBN")]
         public string? ISBN { get; set; }
 
         public string? Description { get; set; }

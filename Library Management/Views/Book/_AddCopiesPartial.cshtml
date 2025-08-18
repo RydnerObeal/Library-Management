@@ -1,0 +1,23 @@
+﻿@model Library_Management.Models.AddCopiesViewModel
+
+<div class="modal-header bg-success text-white">
+    <h5 class="modal-title">Add Copies - @Model.Title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form asp-action="AddCopies" asp-controller="Book" method="post">
+    <div class="modal-body">
+        <input type="hidden" asp-for="BookId" />
+        <p><strong>Current Copies:</strong> @Model.CurrentCopies</p>
+
+        <div class="mb-3">
+            <label asp-for="NumberOfCopies" class="form-label"></label>
+            <input asp-for="NumberOfCopies" class="form-control" type="number" min="1" />
+            <span asp-validation-for="NumberOfCopies" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success">Add</button>
+    </div>
+</form>

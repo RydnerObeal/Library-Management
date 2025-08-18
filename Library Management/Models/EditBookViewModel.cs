@@ -6,10 +6,11 @@ namespace Library_Management.Models
     {
         [Required(ErrorMessage = "Book ID is required.")]
         public Guid BookId { get; set; }
+
         public Guid? BookCopyId { get; set; }
 
         [Required(ErrorMessage = "Book title is required.")]
-        [Display(Name ="Book Title")]
+        [Display(Name = "Book Title")]
         public string? Title { get; set; }
 
         [Required(ErrorMessage = "ISBN is required.")]
@@ -18,11 +19,9 @@ namespace Library_Management.Models
 
         public string? Description { get; set; }
 
-
         [Required(ErrorMessage = "Genre is required.")]
         [Display(Name = "Genre")]
         public string? Genre { get; set; }
-
 
         [Display(Name = "Published Date")]
         public DateTime? PublishedDate { get; set; }
@@ -34,7 +33,15 @@ namespace Library_Management.Models
 
         [Display(Name = "Author Profile Image URL")]
         public string? AuthorProfileImageUrl { get; set; }
+
         [Display(Name = "Cover Image URL")]
         public string? CoverImageUrl { get; set; }
+
+        [Display(Name = "Available Copies")]
+        public int AvailableCopies { get; set; }
+
+        [Display(Name = "Add More Copies")]
+        public int NewCopies { get; set; }
+
     }
 }

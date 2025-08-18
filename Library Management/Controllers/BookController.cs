@@ -81,6 +81,15 @@ namespace Library_Management.Controllers
             return View(book);
         }
 
-      
+        [HttpPost]
+        public IActionResult AddCopies(EditBookViewModel vm)
+        {
+            if (vm.NewCopies > 0)
+            {
+                BookService.Instance.AddCopies(vm.BookId, vm.NewCopies);
+            }
+            return RedirectToAction("Index");
+        }
+
     }
 }

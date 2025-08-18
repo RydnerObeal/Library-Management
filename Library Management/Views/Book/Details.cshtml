@@ -52,11 +52,42 @@
 </div>
 
 <div class="modal-footer">
-
-    <a asp-action="Index" asp-route-id="@Model.BookId" class="btn btn-outline-primary">
+    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
         <i class="bi bi-arrow-left"></i> Close
-    </a>
-    <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-primary">
-        <i class="bi bi-pencil-square"></i> Add Copies
-    </a>
+    </button>
+
+    <!-- Button to open Add Copies modal -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCopiesModal-@Model.BookId">
+        <i class="bi bi-plus-circle"></i> Add Copies
+    </button>
+</div>
+
+<!-- Add Copies Modal -->
+<div class="modal fade" id="addCopiesModal-@Model.BookId" tabindex="-1" aria-labelledby="addCopiesModalLabel-@Model.BookId" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="AddCopies" method="post">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addCopiesModalLabel-@Model.BookId">Add Copies for @Model.Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Hidden BookId -->
+                    <input type="hidden" name="BookId" value="@Model.BookId" />
+
+                    <!-- Number of copies input -->
+                    <div class="mb-3">
+                        <label for="newCopies-@Model.BookId" class="form-label">Number of Copies</label>
+                        <input type="number" class="form-control" id="newCopies-@Model.BookId" name="NewCopies" min="1" required />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

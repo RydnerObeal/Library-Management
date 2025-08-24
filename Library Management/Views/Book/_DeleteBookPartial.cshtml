@@ -1,16 +1,44 @@
 ﻿@model Library_Management.Models.DeleteBookViewModel
 
 <div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Delete Book</h5>
+    <h5 class="modal-title">Delete Book</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 <div class="modal-body">
     <p>Are you sure you want to delete the book <strong>@Model.Title</strong> by <strong>@Model.AuthorName</strong>?</p>
 </div>
 <div class="modal-footer">
-    <form id="deleteBookForm" asp-action="DeleteConfirmed" asp-route-id="@Model.BookId" method="post">
+    <form id="deleteBookForm" asp-controller="Book" asp-action="DeleteConfirmed" asp-route-id="@Model.BookId" method="post">
         @Html.AntiForgeryToken()
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-danger">Delete</button>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#deleteBookForm').submit(function (e) {
+                e.preventDefault(); // Prevent normal form submission
+
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function () {
+                        // Close the modal
+                        var modal = bootstrap.Modal.getInstance(form.closest('.modal'));
+                        modal.hide();
+
+                        // Reload the book list (assuming it's in a div with id="bookList")
+                        $('#bookList').load('/Book/Index #bookList > *');
+                    },
+                    error: function () {
+                        alert('Error deleting book.');
+                    }
+                });
+            });
+        });
+    </script>
+}

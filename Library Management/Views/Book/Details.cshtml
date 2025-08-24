@@ -1,10 +1,12 @@
 ﻿@model Library_Management.Models.BookListViewModel
 
+<!-- Modal Header -->
 <div class="modal-header bg-primary text-white">
     <h5 class="modal-title">@Model.Title</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
+<!-- Modal Body -->
 <div class="modal-body">
     <div class="row g-4">
         <!-- Cover Image -->
@@ -15,7 +17,7 @@
                  style="max-height: 300px; object-fit: cover;">
         </div>
 
-        <!-- Details -->
+        <!-- Book Details -->
         <div class="col-md-8">
             <dl class="row mb-0">
                 <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.ISBN)</dt>
@@ -47,16 +49,68 @@
 
             <h6 class="fw-semibold">@Html.DisplayNameFor(m => m.Description)</h6>
             <p class="mb-0">@Model.Description</p>
+
+            <hr />
+
+            <!-- Book Copies List -->
+            <h6 class="fw-semibold">Book Copies</h6>
+            <ul class="list-group mb-3">
+                @foreach (var copy in Model.Copies)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Copy ID: @copy.CopyId
+                        <span>
+                            @if (copy.PulloutDate != null)
+                            {
+                                <span class="badge bg-danger">Pulled-out</span>
+                                <small class="text-muted ms-2">(@copy.PulloutReason)</small>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#pulloutModal-@copy.CopyId">
+                                    Pull-out
+                                </button>
+                            }
+                        </span>
+                    </li>
+
+                    <!-- Pull-out Modal -->
+                    <div class="modal fade" id="pulloutModal-@copy.CopyId" tabindex="-1" aria-labelledby="pulloutModalLabel-@copy.CopyId" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-action="PulloutCopy" method="post">
+                                    <div class="modal-header bg-warning text-dark">
+                                        <h5 class="modal-title" id="pulloutModalLabel-@copy.CopyId">Pull-out Copy @copy.CopyId</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="CopyId" value="@copy.CopyId" />
+                                        <div class="mb-3">
+                                            <label for="reason-@copy.CopyId" class="form-label">Reason</label>
+                                            <input type="text" class="form-control" id="reason-@copy.CopyId" name="PulloutReason" required />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </ul>
         </div>
     </div>
 </div>
 
+<!-- Modal Footer -->
 <div class="modal-footer">
     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
         <i class="bi bi-arrow-left"></i> Close
     </button>
 
-    <!-- Button to open Add Copies modal -->
+    <!-- Add Copies Button -->
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCopiesModal-@Model.BookId">
         <i class="bi bi-plus-circle"></i> Add Copies
     </button>
@@ -71,18 +125,13 @@
                     <h5 class="modal-title" id="addCopiesModalLabel-@Model.BookId">Add Copies for @Model.Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
-                    <!-- Hidden BookId -->
                     <input type="hidden" name="BookId" value="@Model.BookId" />
-
-                    <!-- Number of copies input -->
                     <div class="mb-3">
                         <label for="newCopies-@Model.BookId" class="form-label">Number of Copies</label>
                         <input type="number" class="form-control" id="newCopies-@Model.BookId" name="NewCopies" min="1" required />
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success">Save</button>
@@ -91,3 +140,65 @@
         </div>
     </div>
 </div>
+
+<!-- Copies Table -->
+<h5 class="mt-4">Copies</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Cover</th>
+            <th>Condition</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var copy in Model.Copies)
+        {
+            <tr class="@(copy.Status == "Pulled-out" ? "table-secondary" : "")">
+                <td>
+                    <img src="@Model.CoverImageUrl" style="width:50px; height:75px; object-fit:cover;" />
+                </td>
+                <td>@copy.Status</td>
+                <td>@(copy.PulloutDate.HasValue ? $"Pulled out ({copy.PulloutReason})" : "Available")</td>
+                <td>
+                    @if (!copy.PulloutDate.HasValue)
+                    {
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#pulloutModal-@copy.CopyId">
+                            Pull-out
+                        </button>
+
+                        <!-- Pull-out Modal -->
+                        <div class="modal fade" id="pulloutModal-@copy.CopyId" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form asp-action="PulloutCopy" method="post">
+                                        <div class="modal-header bg-warning text-dark">
+                                            <h5 class="modal-title">Pull-out Copy</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="copyId" value="@copy.CopyId" />
+                                            <div class="mb-3">
+                                                <label for="reason-@copy.CopyId" class="form-label">Reason</label>
+                                                <input type="text" class="form-control" id="reason-@copy.CopyId" name="pulloutReason" required />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-warning">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Pulled-out</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

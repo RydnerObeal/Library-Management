@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Library_Management.Models.BookListViewModel>
+
+<h1>Archived Books</h1>
+
+@foreach (var book in Model)
+{
+    <div>
+        <p>@book.Title - @book.AuthorName</p>
+        <form asp-action="Restore" method="post">
+            <input type="hidden" name="id" value="@book.BookId" />
+            <button type="submit">Restore</button>
+        </form>
+    </div>
+}
